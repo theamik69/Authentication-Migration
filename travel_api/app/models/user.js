@@ -1,29 +1,27 @@
 'use strict';
+
 const {
+  // eslint-disable-next-line comma-dangle
   Model
 } = require('sequelize');
+
 module.exports = (sequelize, DataTypes) => {
   class User extends Model {
-    /**
-     * Helper method for defining associations.
-     * This method is not a part of Sequelize lifecycle.
-     * The `models/index` file will call this method automatically.
-     */
     static associate(models) {
-      // define association here
-      User.hasMany(models.Book, { foreignKey: 'user_id', as: 'books' });
+      User.hasMany(models.Booking, { foreignKey: 'user_id' });
     }
   }
   User.init({
     id: {
-      allowNull: false,
-      autoIncrement: true,
+      type: DataTypes.STRING,
       primaryKey: true,
-      type: Sequelize.INTEGER
+      allowNull: false,
     },
+    user_name: DataTypes.STRING,
+    password: DataTypes.STRING,
     name: DataTypes.STRING,
     email: DataTypes.STRING,
-    phone: DataTypes.STRING
+    phone: DataTypes.STRING,
   }, {
     sequelize,
     modelName: 'User',

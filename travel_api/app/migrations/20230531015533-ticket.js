@@ -3,43 +3,47 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('Bookings', {
+    await queryInterface.createTable('Tickets', {
       id: {
         allowNull: false,
         primaryKey: true,
-        type: Sequelize.STRING,
+        type: Sequelize.UUID,
       },
-      user_id: {
-        allowNull: false,
+      booking_id: {
         type: Sequelize.STRING,
         references: {
-          model: 'Users',
+          model: 'Bookings',
           key: 'id',
         },
         onDelete: 'CASCADE',
       },
+      passenger_id: {
+        type: Sequelize.INTEGER,
+        references: {
+          model: 'Passengers',
+          key: 'id',
+        },
+        onDelete: 'CASCADE',
+      },
+      passenger_name: {
+        type: Sequelize.STRING,
+      },
       departure_date: {
-        allowNull: false,
         type: Sequelize.DATE,
       },
       departure_time: {
-        allowNull: false,
         type: Sequelize.STRING,
       },
       departure_location: {
-        allowNull: false,
         type: Sequelize.STRING,
       },
       destination: {
-        allowNull: false,
         type: Sequelize.STRING,
       },
-      passenger_count: {
-        allowNull: false,
+      ticket_price: {
         type: Sequelize.INTEGER,
       },
-      total_price: {
-        allowNull: false,
+      seat_number: {
         type: Sequelize.INTEGER,
       },
       createdAt: {
@@ -53,6 +57,6 @@ module.exports = {
     });
   },
   async down(queryInterface) {
-    await queryInterface.dropTable('Bookings');
+    await queryInterface.dropTable('Tickets');
   },
 };

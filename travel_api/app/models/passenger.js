@@ -1,7 +1,9 @@
 'use strict';
+
 const {
-  Model
+  Model,
 } = require('sequelize');
+
 module.exports = (sequelize, DataTypes) => {
   class Passenger extends Model {
     /**
@@ -10,11 +12,19 @@ module.exports = (sequelize, DataTypes) => {
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-      // define association here
+      Passenger.belongsTo(models.Booking, { foreignKey: 'booking_id', as: 'bookingId' });
+      Passenger.hasOne(models.Ticket, { foreignKey: 'passenger_id', as: 'tiket' });
     }
   }
   Passenger.init({
-    full_name: DataTypes.STRING
+    id: {
+      allowNull: false,
+      autoIncrement: true,
+      primaryKey: true,
+      type: DataTypes.INTEGER,
+    },
+    booking_id: DataTypes.STRING,
+    full_name: DataTypes.STRING,
   }, {
     sequelize,
     modelName: 'Passenger',
