@@ -7,7 +7,6 @@ const { Ticket } = require('../models');
 module.exports = {
 
   add(req, res) {
-    // 1. Cari harga berdasarkan departure_location dan destination
     Price.findOne({
       where: {
         departure: req.body.departure_location,
@@ -22,13 +21,11 @@ module.exports = {
           });
         }
 
-        // 2. Simpan total_price dari hasil seleksi harga
         const bookingId = `booking-${nanoid(12)}`;
         const ticketPrice = price.price;
         const passengerCount = req.body.passenger_count;
         const totalPrice = ticketPrice * passengerCount;
 
-        // 3. Buat booking dengan total_price yang sudah didapatkan
         return Booking.create({
           id: bookingId,
           user_id: req.body.userid,
@@ -41,25 +38,21 @@ module.exports = {
         });
       })
       .then((booking) => {
-        const bookingId = booking.id; // Ambil booking_id yang dihasilkan
+        const bookingId = booking.id;
         const totalPrice = booking.total_price;
         const passengerCount = booking.passenger_count;
         const ticketPrice = totalPrice / passengerCount;
 
-        // Simpan data penumpang ke dalam tabel passenger
         if (req.body.passengers && req.body.passengers.length > 0) {
           const passengerPromises = req.body.passengers.map((passenger) => Passenger.create({
             booking_id: bookingId,
             full_name: passenger.full_name,
-            // ... data penumpang lainnya
           }));
 
-          // Menjalankan semua operasi pembuatan penumpang secara paralel
           return Promise.all(passengerPromises)
             .then((passengers) => {
               const passengerIds = passengers.map((passenger) => passenger.id);
 
-              // 5. Simpan data tiket ke dalam tabel tiket untuk setiap penumpang
               const ticketPromises = passengerIds.map((passengerId, index) => Ticket.create({
                 booking_id: bookingId,
                 passenger_id: passengerId,
@@ -72,7 +65,6 @@ module.exports = {
                 seat_number: req.body.passengers[index].seat,
               }));
 
-              // Menjalankan semua operasi pembuatan tiket secara paralel
               return Promise.all(ticketPromises);
             })
             .then(() => {
@@ -161,143 +153,4 @@ module.exports = {
       });
   },
 
-  //   list(req, res) {
-  //     return Status
-  //       .findAll({
-  //         limit: 10,
-  //         include: [],
-  //         order: [
-  //           ['createdAt', 'DESC'],
-  //         ],
-  //       })
-  //       .then((docs) => {
-  //         const statuses = {
-  //           status_response: 'OK',
-  //           count: docs.length,
-  //           statuses: docs.map((doc) => doc),
-  //           errors: null,
-  //         };
-  //         res.status(200).send(statuses);
-  //       })
-  //       .catch((error) => {
-  //         res.status(400).send({
-  //           status_response: 'Bad Request',
-  //           errors: error,
-  //         });
-  //       });
-  //   },
-
-  //   listStatusUser(req, res) {
-  //     return Status
-  //       .findAll({
-  //         limit: 10,
-  //         include: [],
-  //         where: {
-  //           user_id: req.userId,
-  //         },
-  //         order: [
-  //           ['createdAt', 'DESC'],
-  //         ],
-  //       })
-  //       .then((docs) => {
-  //         const statuses = {
-  //           status_response: 'OK',
-  //           count: docs.length,
-  //           statuses: docs.map((doc) => doc),
-  //           errors: null,
-  //         };
-  //         res.status(200).send(statuses);
-  //       })
-  //       .catch((error) => {
-  //         res.status(400).send({
-  //           status_response: 'Bad Request',
-  //           errors: error,
-  //         });
-  //       });
-  //   },
-
-  //   update(req, res) {
-  //     return Status
-  //       .findByPk(req.params.id, {})
-  //       .then((status) => {
-  //         if (!status) {
-  //           return res.status(404).send({
-  //             status_response: 'Bad Request',
-  //             errors: 'Status Not Found',
-  //           });
-  //         }
-
-  //         if (status.user_id !== req.userId) {
-  //           return res.status(403).send({
-  //             status_response: 'Bad Request',
-  //             errors: 'Different User Id',
-  //           });
-  //         }
-
-  //         return status
-  //           .update({
-  //             title: req.body.title || status.title,
-  //             body: req.body.body || status.body,
-  //           })
-  //           .then((doc) => {
-  //             const status = {
-  //               status_response: 'OK',
-  //               status: doc,
-  //               errors: null,
-  //             };
-  //             return res.status(200).send(status);
-  //           })
-  //           .catch((error) => {
-  //             res.status(400).send({
-  //               status_response: 'Bad Request',
-  //               errors: error,
-  //             });
-  //           });
-  //       })
-  //       .catch((error) => {
-  //         res.status(400).send({
-  //           status_response: 'Bad Request',
-  //           errors: error,
-  //         });
-  //       });
-  //   },
-
-  //   delete(req, res) {
-  //     return Status
-  //       .findByPk(req.params.id)
-  //       .then((status) => {
-  //         if (!status) {
-  //           return res.status(400).send({
-  //             status_response: 'Bad Request',
-  //             errors: 'Status Not Found',
-  //           });
-  //         }
-
-  //         if (status.user_id !== req.userId) {
-  //           return res.status(403).send({
-  //             status_response: 'Bad Request',
-  //             errors: 'Different User Id',
-  //           });
-  //         }
-
-//         return status
-//           .destroy()
-//           .then(() => res.status(204).send({
-//             status_response: 'No Content',
-//             errors: null,
-//           }))
-//           .catch((error) => {
-//             res.status(400).send({
-//               status_response: 'Bad Request',
-//               errors: error,
-//             });
-//           });
-//       })
-//       .catch((error) => {
-//         res.status(400).send({
-//           status_response: 'Bad Request',
-//           errors: error,
-//         });
-//       });
-//   },
 };

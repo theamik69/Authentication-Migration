@@ -6,7 +6,6 @@ const verifyAvailableSeat = require('../api/verifySeat');
 const verifyUser = require('../api/verifyUser');
 
 module.exports = function (app) {
-  // User Auth
   app.post(
     '/registration',
     verifySignUpController.checkDuplicateUserNamePhoneAndEmail,
